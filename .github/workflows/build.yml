@@ -1,0 +1,38 @@
+name: Build PrettyPipes WorldEdit Compat
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x ./gradlew
+
+      - name: Build PrettyPipes WorldEdit Compat
+        run: ./gradlew clean build --no-daemon --stacktrace
+
+      - name: Upload PrettyPipes WorldEdit Compat jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: PrettyPipesWorldEditCompat-NeoForge-1.21.1
+          path: |
+            build/libs/*.jar
+          if-no-files-found: error
