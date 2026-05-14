@@ -15,6 +15,7 @@ public final class PpweCompatMod {
     public PpweCompatMod(IEventBus modBus) {
         WorldEdit.getInstance().getEventBus().register(new WorldEditHooks());
         NeoForge.EVENT_BUS.addListener(PrettyPipeEditTracker::onServerTick);
+        PressurizerSpeedFeature.logEnabled();
         LOGGER.info("Pretty Pipes WorldEdit Compat loaded");
     }
 }
