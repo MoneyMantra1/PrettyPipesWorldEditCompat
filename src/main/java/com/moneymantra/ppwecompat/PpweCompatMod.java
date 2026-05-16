@@ -20,6 +20,6 @@ public final class PpweCompatMod {
         NeoForge.EVENT_BUS.addListener(FilterWandFeature::onEntityInteract);
         NeoForge.EVENT_BUS.addListener(FilterWandFeature::onRightClickBlock);
         PressurizerSpeedFeature.logEnabled();
-        LOGGER.info("Pretty Pipes WorldEdit Compat loaded");
+        LOGGER.info("PrettyPipes+ loaded");
     }
 }

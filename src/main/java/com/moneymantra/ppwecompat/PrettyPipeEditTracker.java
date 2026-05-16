@@ -215,26 +215,18 @@ final class PrettyPipeEditTracker {
     }
 
     private static Component createSummaryMessage(PendingBatch batch, int rebuilt, int removed, int neighborRefreshed, int rotatedModules, String action) {
-        Component message = PpweMessages.text("Network refresh complete: ")
-            .append(PpweMessages.value(Integer.toString(rebuilt)))
-            .append(PpweMessages.text(" rebuilt, "))
-            .append(PpweMessages.value(Integer.toString(removed)))
-            .append(PpweMessages.text(" removed, "))
-            .append(PpweMessages.value(Integer.toString(neighborRefreshed)))
-            .append(PpweMessages.text(" boundary refreshed"));
+        Map<String, Component> replacements = new HashMap<>();
+        replacements.put("rebuilt", PpweMessages.value(Integer.toString(rebuilt)));
+        replacements.put("removed", PpweMessages.value(Integer.toString(removed)));
+        replacements.put("boundary", PpweMessages.value(Integer.toString(neighborRefreshed)));
+        replacements.put("rotated", PpweMessages.value(Integer.toString(rotatedModules)));
+        replacements.put("rotation", PpweMessages.muted(batch.key.rotation().label()));
+        replacements.put("action", PpweMessages.value(action));
 
-        if (batch.key.isPaste() && batch.key.rotation().rotatesDirections()) {
-            message = message.copy()
-                .append(PpweMessages.text(", "))
-                .append(PpweMessages.value(Integer.toString(rotatedModules)))
-                .append(PpweMessages.text(" module directions rotated "))
-                .append(PpweMessages.muted("(" + batch.key.rotation().label() + ")"));
-        }
-
-        return PpweMessages.worldEdit(message.copy()
-            .append(PpweMessages.text(" after "))
-            .append(PpweMessages.value(action))
-            .append(PpweMessages.text(".")));
+        String key = batch.key.isPaste() && batch.key.rotation().rotatesDirections()
+            ? "message.worldedit.summary_rotated"
+            : "message.worldedit.summary";
+        return PpweMessages.worldEdit(key, replacements);
     }
 
     private static void addNeighborPositions(PendingBatch batch, BlockPos pos) {

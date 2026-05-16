@@ -6,4 +6,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'PrettyPipesWorldEditCompat'
+rootProject.name = 'PrettyPipesPlus'

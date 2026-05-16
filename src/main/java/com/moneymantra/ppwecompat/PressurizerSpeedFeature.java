@@ -16,7 +16,7 @@ public final class PressurizerSpeedFeature {
 
     public static void logEnabled() {
         PpweCompatMod.LOGGER.info(
-            "Pretty Pipes pressurizer speed multiplier loaded: {}x ({} speed bonus)",
+            "PrettyPipes+ pressurizer speed multiplier loaded: {}x ({} speed bonus)",
             PpweCompatConfig.formatFloat(PpweCompatConfig.getPressurizerSpeedMultiplier()),
             PpweCompatConfig.formatFloat(getPressurizerSpeedBonus())
         );

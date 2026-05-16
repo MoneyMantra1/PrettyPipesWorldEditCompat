@@ -6,9 +6,12 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+
+import java.util.Map;
 
 public final class PipeCommandFeature {
     private PipeCommandFeature() {
@@ -37,6 +40,8 @@ public final class PipeCommandFeature {
                     .executes(context -> setMessages(context.getSource(), true)))
                 .then(Commands.literal("off")
                     .executes(context -> setMessages(context.getSource(), false))))
+            .then(Commands.literal("reload")
+                .executes(context -> reloadConfig(context.getSource())))
             .then(Commands.literal("tool")
                 .then(Commands.argument("target", EntityArgument.player())
                     .executes(context -> giveTool(
@@ -55,11 +60,11 @@ public final class PipeCommandFeature {
     private static int showSpeed(CommandSourceStack source) {
         float multiplier = PpweCompatConfig.getPressurizerSpeedMultiplier();
         source.sendSuccess(() -> PpweMessages.command(
-            PpweMessages.text("Pressurizer speed multiplier: ")
-                .append(PpweMessages.value(PpweCompatConfig.formatFloat(multiplier) + "x"))
-                .append(PpweMessages.muted(" | "))
-                .append(PpweMessages.text("Bonus: "))
-                .append(PpweMessages.value(PpweCompatConfig.formatFloat(PressurizerSpeedFeature.getPressurizerSpeedBonus()) + "F"))
+            "message.command.speed.status",
+            Map.of(
+                "multiplier", PpweMessages.value(PpweCompatConfig.formatFloat(multiplier)),
+                "bonus", PpweMessages.value(PpweCompatConfig.formatFloat(PressurizerSpeedFeature.getPressurizerSpeedBonus()))
+            )
         ), false);
         return 1;
     }
@@ -67,12 +72,12 @@ public final class PipeCommandFeature {
     private static int setSpeed(CommandSourceStack source, float multiplier) {
         float applied = PpweCompatConfig.setPressurizerSpeedMultiplier(multiplier);
         source.sendSuccess(() -> PpweMessages.command(
-            PpweMessages.success("Pressurizer speed updated. ")
-                .append(PpweMessages.text("Multiplier: "))
-                .append(PpweMessages.value(PpweCompatConfig.formatFloat(applied) + "x"))
-                .append(PpweMessages.muted(" | "))
-                .append(PpweMessages.text("Bonus: "))
-                .append(PpweMessages.value(PpweCompatConfig.formatFloat(PressurizerSpeedFeature.getPressurizerSpeedBonus()) + "F"))
+            "message.command.speed.updated",
+            "success",
+            Map.of(
+                "multiplier", PpweMessages.value(PpweCompatConfig.formatFloat(applied)),
+                "bonus", PpweMessages.value(PpweCompatConfig.formatFloat(PressurizerSpeedFeature.getPressurizerSpeedBonus()))
+            )
         ), true);
         return 1;
     }
@@ -80,8 +85,8 @@ public final class PipeCommandFeature {
     private static int showMessages(CommandSourceStack source) {
         boolean enabled = PpweCompatConfig.areWorldEditSummaryMessagesEnabled();
         source.sendSuccess(() -> PpweMessages.command(
-            PpweMessages.text("WorldEdit summary messages: ")
-                .append(enabled ? PpweMessages.success("Enabled") : PpweMessages.warning("Disabled"))
+            "message.command.messages.status",
+            Map.of("status", statusComponent(enabled))
         ), false);
         return 1;
     }
@@ -89,10 +94,21 @@ public final class PipeCommandFeature {
     private static int setMessages(CommandSourceStack source, boolean enabled) {
         PpweCompatConfig.setWorldEditSummaryMessages(enabled);
         source.sendSuccess(() -> PpweMessages.command(
-            PpweMessages.text("WorldEdit summary messages are now ")
-                .append(enabled ? PpweMessages.success("enabled") : PpweMessages.warning("disabled"))
-                .append(PpweMessages.text("."))
+            "message.command.messages.updated",
+            enabled ? "success" : "warning",
+            Map.of("status", statusComponent(enabled))
         ), true);
+        return 1;
+    }
+
+    private static int reloadConfig(CommandSourceStack source) {
+        PpweCompatConfig.reload();
+        source.sendSuccess(() -> PpweMessages.command(
+            "message.command.reload.complete",
+            "success",
+            Map.of("file", PpweMessages.value(PpweCompatConfig.getConfigFileName()))
+        ), true);
+        PressurizerSpeedFeature.logEnabled();
         return 1;
     }
 
@@ -109,12 +125,18 @@ public final class PipeCommandFeature {
         }
 
         source.sendSuccess(() -> PpweMessages.command(
-            PpweMessages.success("Issued ")
-                .append(PpweMessages.value(Integer.toString(amount)))
-                .append(PpweMessages.text(" Pipe Filter Wand" + (amount == 1 ? "" : "s") + " to "))
-                .append(PpweMessages.value(target.getGameProfile().getName()))
-                .append(PpweMessages.text("."))
+            "message.command.tool.issued",
+            "success",
+            Map.of(
+                "amount", PpweMessages.value(Integer.toString(amount)),
+                "plural", Component.literal(amount == 1 ? "" : "s"),
+                "player", PpweMessages.value(target.getGameProfile().getName())
+            )
         ), true);
         return amount;
+    }
+
+    private static Component statusComponent(boolean enabled) {
+        return enabled ? PpweMessages.success("enabled") : PpweMessages.warning("disabled");
     }
 }

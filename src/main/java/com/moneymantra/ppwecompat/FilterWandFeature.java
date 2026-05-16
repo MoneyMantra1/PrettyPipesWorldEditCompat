@@ -4,11 +4,9 @@ import de.ellpeck.prettypipes.misc.ItemFilter;
 import de.ellpeck.prettypipes.pipe.PipeBlockEntity;
 import de.ellpeck.prettypipes.pipe.modules.filter.FilterIncreaseModuleItem;
 import de.ellpeck.prettypipes.pipe.modules.insertion.FilterModuleItem;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -41,11 +39,10 @@ public final class FilterWandFeature {
         CompoundTag tag = new CompoundTag();
         tag.putBoolean(TOOL_TAG, true);
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
-        stack.set(DataComponents.CUSTOM_NAME, Component.literal("Pipe Filter Wand").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
+        stack.set(DataComponents.CUSTOM_NAME, PpweMessages.toolName());
         stack.set(DataComponents.LORE, new ItemLore(List.of(
-            Component.literal("Copy an item from an item frame.").withStyle(ChatFormatting.GRAY),
-            Component.literal("Apply it to a Pretty Pipes filter module.").withStyle(ChatFormatting.GRAY),
-            Component.literal("Operator utility item.").withStyle(ChatFormatting.DARK_GRAY)
+            PpweMessages.toolLoreLine("message.tool.lore.1"),
+            PpweMessages.toolLoreLine("message.tool.lore.2")
         )));
         return stack;
     }
@@ -64,7 +61,9 @@ public final class FilterWandFeature {
         ItemStack framed = frame.getItem();
         if (framed.isEmpty()) {
             serverPlayer.sendSystemMessage(PpweMessages.filterWand(
-                PpweMessages.warning("That item frame is empty.")
+                "message.filter.empty_frame",
+                "warning",
+                Map.of()
             ));
             cancelSuccess(event);
             return;
@@ -74,9 +73,9 @@ public final class FilterWandFeature {
         copied.setCount(1);
         CLIPBOARDS.put(serverPlayer.getUUID(), copied);
         serverPlayer.sendSystemMessage(PpweMessages.filterWand(
-            PpweMessages.copied("Copied ")
-                .append(PpweMessages.itemName(copied))
-                .append(PpweMessages.copied(" to the clipboard."))
+            "message.filter.copied",
+            "copied",
+            Map.of("item", PpweMessages.itemName(copied))
         ));
         cancelSuccess(event);
     }
@@ -100,7 +99,9 @@ public final class FilterWandFeature {
         ItemStack copied = CLIPBOARDS.get(serverPlayer.getUUID());
         if (copied == null || copied.isEmpty()) {
             serverPlayer.sendSystemMessage(PpweMessages.filterWand(
-                PpweMessages.warning("Copy an item from an item frame first.")
+                "message.filter.copy_first",
+                "warning",
+                Map.of()
             ));
             cancelSuccess(event);
             return;
@@ -111,27 +112,33 @@ public final class FilterWandFeature {
             case ADDED_TO_BASE_FILTER -> {
                 markPipeChanged(level, pos, pipe);
                 serverPlayer.sendSystemMessage(PpweMessages.filterWand(
-                    PpweMessages.added("Added ")
-                        .append(PpweMessages.itemName(copied))
-                        .append(PpweMessages.added(" to the pipe filter module."))
+                    "message.filter.added_base",
+                    "added",
+                    Map.of("item", PpweMessages.itemName(copied))
                 ));
             }
             case ADDED_TO_FILTER_INCREASE -> {
                 markPipeChanged(level, pos, pipe);
                 serverPlayer.sendSystemMessage(PpweMessages.filterWand(
-                    PpweMessages.added("Added ")
-                        .append(PpweMessages.itemName(copied))
-                        .append(PpweMessages.added(" to a filter increase modifier."))
+                    "message.filter.added_modifier",
+                    "added",
+                    Map.of("item", PpweMessages.itemName(copied))
                 ));
             }
             case DUPLICATE -> serverPlayer.sendSystemMessage(PpweMessages.filterWand(
-                PpweMessages.duplicate("This item is already added to this pipe filter.")
+                "message.filter.duplicate",
+                "duplicate",
+                Map.of()
             ));
             case NO_FILTER_MODULE -> serverPlayer.sendSystemMessage(PpweMessages.filterWand(
-                PpweMessages.error("No Low, Medium, or High Filter Module was found in this pipe.")
+                "message.filter.no_filter",
+                "error",
+                Map.of()
             ));
             case FULL -> serverPlayer.sendSystemMessage(PpweMessages.filterWand(
-                PpweMessages.error("This pipe filter and all filter increase modifiers are full.")
+                "message.filter.full",
+                "error",
+                Map.of()
             ));
         }
         cancelSuccess(event);
