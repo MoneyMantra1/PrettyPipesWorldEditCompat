@@ -37,7 +37,7 @@ public final class PpweCompatConfig {
         DEFAULT_MESSAGES.put("message.command.tool.issued", "Gave {amount} Filter Wand{plural} to {player}");
         DEFAULT_MESSAGES.put("message.command.reload.complete", "Configuration reloaded from {file}");
         DEFAULT_MESSAGES.put("message.filter.empty_frame", "Item frame is empty");
-        DEFAULT_MESSAGES.put("message.filter.copied", "Copied {item}");
+        DEFAULT_MESSAGES.put("message.filter.copied", "Copied exact item data for {item}");
         DEFAULT_MESSAGES.put("message.filter.copy_first", "Copy an item first");
         DEFAULT_MESSAGES.put("message.filter.added_base", "Added {item} to filter");
         DEFAULT_MESSAGES.put("message.filter.added_modifier", "Added {item} to filter modifier");
@@ -47,8 +47,8 @@ public final class PpweCompatConfig {
         DEFAULT_MESSAGES.put("message.worldedit.summary", "WorldEdit repair complete — {rebuilt} rebuilt, {removed} removed, {boundary} refreshed");
         DEFAULT_MESSAGES.put("message.worldedit.summary_rotated", "WorldEdit repair complete — {rebuilt} rebuilt, {removed} removed, {boundary} refreshed, {rotated} rotated ({rotation})");
         DEFAULT_MESSAGES.put("message.tool.name", "PrettyPipes+ Filter Wand");
-        DEFAULT_MESSAGES.put("message.tool.lore.1", "Copy an item frame, then apply it to a pipe filter.");
-        DEFAULT_MESSAGES.put("message.tool.lore.2", "Operator utility item.");
+        DEFAULT_MESSAGES.put("message.tool.lore.1", "Copy exact item data from an item frame.");
+        DEFAULT_MESSAGES.put("message.tool.lore.2", "Apply it directly to a pipe filter.");
 
         DEFAULT_COLORS.put("color.prefix", "#35D6E8");
         DEFAULT_COLORS.put("color.separator", "#5C6370");

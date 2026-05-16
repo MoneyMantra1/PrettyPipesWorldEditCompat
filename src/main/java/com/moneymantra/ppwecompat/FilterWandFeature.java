@@ -23,7 +23,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,11 +34,12 @@ public final class FilterWandFeature {
     }
 
     public static ItemStack createTool(int amount) {
-        ItemStack stack = new ItemStack(Items.STICK, amount);
+        ItemStack stack = new ItemStack(Items.BREEZE_ROD, amount);
         CompoundTag tag = new CompoundTag();
         tag.putBoolean(TOOL_TAG, true);
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
         stack.set(DataComponents.CUSTOM_NAME, PpweMessages.toolName());
+        stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
         stack.set(DataComponents.LORE, new ItemLore(List.of(
             PpweMessages.toolLoreLine("message.tool.lore.1"),
             PpweMessages.toolLoreLine("message.tool.lore.2")
@@ -69,8 +69,7 @@ public final class FilterWandFeature {
             return;
         }
 
-        ItemStack copied = framed.copy();
-        copied.setCount(1);
+        ItemStack copied = copyExactSingleItem(framed);
         CLIPBOARDS.put(serverPlayer.getUUID(), copied);
         serverPlayer.sendSystemMessage(PpweMessages.filterWand(
             "message.filter.copied",
@@ -196,8 +195,7 @@ public final class FilterWandFeature {
         for (ItemFilter filter : filters) {
             for (int slot = 0; slot < filter.content.getSlots(); slot++) {
                 if (filter.content.getStackInSlot(slot).isEmpty()) {
-                    ItemStack entry = copied.copy();
-                    entry.setCount(1);
+                    ItemStack entry = copyExactSingleItem(copied);
                     filter.content.setStackInSlot(slot, entry);
                     filter.save();
                     return true;
@@ -208,11 +206,17 @@ public final class FilterWandFeature {
     }
 
     private static boolean sameItemAndComponents(ItemStack first, ItemStack second) {
-        return first.is(second.getItem()) && Objects.equals(first.getComponents(), second.getComponents());
+        return ItemStack.isSameItemSameComponents(first, second);
+    }
+
+    private static ItemStack copyExactSingleItem(ItemStack source) {
+        ItemStack copy = source.copy();
+        copy.setCount(1);
+        return copy;
     }
 
     private static boolean isTool(ItemStack stack) {
-        if (stack.isEmpty() || !stack.is(Items.STICK)) {
+        if (stack.isEmpty() || !stack.is(Items.BREEZE_ROD)) {
             return false;
         }
         CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
