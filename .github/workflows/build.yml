@@ -1,4 +1,4 @@
-name: Build PrettyPipes WorldEdit Compat
+name: Build PrettyPipes+
 
 on:
   workflow_dispatch:
@@ -26,13 +26,13 @@ jobs:
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
 
-      - name: Build PrettyPipes WorldEdit Compat
+      - name: Build PrettyPipes+
         run: ./gradlew clean build --no-daemon --stacktrace
 
-      - name: Upload PrettyPipes WorldEdit Compat jar
+      - name: Upload PrettyPipes+ jar
         uses: actions/upload-artifact@v4
         with:
-          name: PrettyPipesWorldEditCompat-NeoForge-1.21.1
+          name: PrettyPipesPlus-NeoForge-1.21.1
           path: |
             build/libs/*.jar
           if-no-files-found: error
