@@ -18,7 +18,7 @@ public abstract class PipeBlockEntityPressurizerSpeedMixin {
         constant = @Constant(floatValue = PressurizerSpeedFeature.ORIGINAL_PRESSURIZER_SPEED_BONUS),
         remap = false
     )
-    private float ppwecompat$increasePressurizerSpeedBonus(float original) {
-        return PressurizerSpeedFeature.ENHANCED_PRESSURIZER_SPEED_BONUS;
+    private float ppwecompat$applyPressurizerSpeedMultiplier(float original) {
+        return PressurizerSpeedFeature.getPressurizerSpeedBonus();
     }
 }

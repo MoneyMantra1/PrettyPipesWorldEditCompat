@@ -202,12 +202,15 @@ final class PrettyPipeEditTracker {
         }
         message += " after " + action + ".";
 
+        PpweCompatMod.LOGGER.info("{}: {}", batch.key.actorName(), message);
+        if (!PpweCompatConfig.areWorldEditSummaryMessagesEnabled()) {
+            return;
+        }
+
         UUID actorId = batch.key.actorId();
         ServerPlayer player = actorId != null ? batch.key.level().getServer().getPlayerList().getPlayer(actorId) : null;
         if (player != null) {
             player.sendSystemMessage(Component.literal(message));
-        } else {
-            PpweCompatMod.LOGGER.info("{}: {}", batch.key.actorName(), message);
         }
     }
 

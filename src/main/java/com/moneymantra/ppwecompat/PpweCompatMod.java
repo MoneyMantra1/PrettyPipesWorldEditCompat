@@ -13,8 +13,12 @@ public final class PpweCompatMod {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public PpweCompatMod(IEventBus modBus) {
+        PpweCompatConfig.load();
         WorldEdit.getInstance().getEventBus().register(new WorldEditHooks());
         NeoForge.EVENT_BUS.addListener(PrettyPipeEditTracker::onServerTick);
+        NeoForge.EVENT_BUS.addListener(PipeCommandFeature::onRegisterCommands);
+        NeoForge.EVENT_BUS.addListener(FilterWandFeature::onEntityInteract);
+        NeoForge.EVENT_BUS.addListener(FilterWandFeature::onRightClickBlock);
         PressurizerSpeedFeature.logEnabled();
         LOGGER.info("Pretty Pipes WorldEdit Compat loaded");
     }
