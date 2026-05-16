@@ -202,7 +202,12 @@ public final class FilterWandFeature {
         level.sendBlockUpdated(pos, state, state, 3);
     }
 
-    private static void cancelSuccess(PlayerInteractEvent event) {
+    private static void cancelSuccess(PlayerInteractEvent.EntityInteract event) {
+        event.setCancellationResult(InteractionResult.SUCCESS);
+        event.setCanceled(true);
+    }
+
+    private static void cancelSuccess(PlayerInteractEvent.RightClickBlock event) {
         event.setCancellationResult(InteractionResult.SUCCESS);
         event.setCanceled(true);
     }
