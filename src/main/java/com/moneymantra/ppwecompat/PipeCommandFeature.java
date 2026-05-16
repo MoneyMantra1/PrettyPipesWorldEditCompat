@@ -6,7 +6,6 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -55,41 +54,44 @@ public final class PipeCommandFeature {
 
     private static int showSpeed(CommandSourceStack source) {
         float multiplier = PpweCompatConfig.getPressurizerSpeedMultiplier();
-        source.sendSuccess(() -> Component.literal(
-            "Pipe pressurizer speed multiplier is "
-                + PpweCompatConfig.formatFloat(multiplier)
-                + "x. Pressurizer bonus: "
-                + PpweCompatConfig.formatFloat(PressurizerSpeedFeature.getPressurizerSpeedBonus())
-                + "F."
+        source.sendSuccess(() -> PpweMessages.command(
+            PpweMessages.text("Pressurizer speed multiplier: ")
+                .append(PpweMessages.value(PpweCompatConfig.formatFloat(multiplier) + "x"))
+                .append(PpweMessages.muted(" | "))
+                .append(PpweMessages.text("Bonus: "))
+                .append(PpweMessages.value(PpweCompatConfig.formatFloat(PressurizerSpeedFeature.getPressurizerSpeedBonus()) + "F"))
         ), false);
         return 1;
     }
 
     private static int setSpeed(CommandSourceStack source, float multiplier) {
         float applied = PpweCompatConfig.setPressurizerSpeedMultiplier(multiplier);
-        source.sendSuccess(() -> Component.literal(
-            "Pipe pressurizer speed multiplier set to "
-                + PpweCompatConfig.formatFloat(applied)
-                + "x. Pressurizer bonus is now "
-                + PpweCompatConfig.formatFloat(PressurizerSpeedFeature.getPressurizerSpeedBonus())
-                + "F."
+        source.sendSuccess(() -> PpweMessages.command(
+            PpweMessages.success("Pressurizer speed updated. ")
+                .append(PpweMessages.text("Multiplier: "))
+                .append(PpweMessages.value(PpweCompatConfig.formatFloat(applied) + "x"))
+                .append(PpweMessages.muted(" | "))
+                .append(PpweMessages.text("Bonus: "))
+                .append(PpweMessages.value(PpweCompatConfig.formatFloat(PressurizerSpeedFeature.getPressurizerSpeedBonus()) + "F"))
         ), true);
         return 1;
     }
 
     private static int showMessages(CommandSourceStack source) {
-        source.sendSuccess(() -> Component.literal(
-            "Pipe WorldEdit summary messages are "
-                + (PpweCompatConfig.areWorldEditSummaryMessagesEnabled() ? "on" : "off")
-                + "."
+        boolean enabled = PpweCompatConfig.areWorldEditSummaryMessagesEnabled();
+        source.sendSuccess(() -> PpweMessages.command(
+            PpweMessages.text("WorldEdit summary messages: ")
+                .append(enabled ? PpweMessages.success("Enabled") : PpweMessages.warning("Disabled"))
         ), false);
         return 1;
     }
 
     private static int setMessages(CommandSourceStack source, boolean enabled) {
         PpweCompatConfig.setWorldEditSummaryMessages(enabled);
-        source.sendSuccess(() -> Component.literal(
-            "Pipe WorldEdit summary messages are now " + (enabled ? "on" : "off") + "."
+        source.sendSuccess(() -> PpweMessages.command(
+            PpweMessages.text("WorldEdit summary messages are now ")
+                .append(enabled ? PpweMessages.success("enabled") : PpweMessages.warning("disabled"))
+                .append(PpweMessages.text("."))
         ), true);
         return 1;
     }
@@ -106,8 +108,12 @@ public final class PipeCommandFeature {
             remaining -= stackAmount;
         }
 
-        source.sendSuccess(() -> Component.literal(
-            "Gave " + amount + " Pipe Filter Wand" + (amount == 1 ? "" : "s") + " to " + target.getGameProfile().getName() + "."
+        source.sendSuccess(() -> PpweMessages.command(
+            PpweMessages.success("Issued ")
+                .append(PpweMessages.value(Integer.toString(amount)))
+                .append(PpweMessages.text(" Pipe Filter Wand" + (amount == 1 ? "" : "s") + " to "))
+                .append(PpweMessages.value(target.getGameProfile().getName()))
+                .append(PpweMessages.text("."))
         ), true);
         return amount;
     }

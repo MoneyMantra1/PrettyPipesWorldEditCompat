@@ -193,16 +193,16 @@ final class PrettyPipeEditTracker {
         }
 
         String action = batch.key.isPaste() ? "WorldEdit paste" : "WorldEdit edit";
-        String message = "[PPWE Compat] "
-            + "Rebuilt " + rebuilt + " Pretty Pipes, "
-            + "cleaned " + removed + " removed pipes, "
-            + "refreshed " + neighborRefreshed + " boundary pipes";
+        String logMessage = "Network refresh complete: "
+            + rebuilt + " rebuilt, "
+            + removed + " removed, "
+            + neighborRefreshed + " boundary refreshed";
         if (batch.key.isPaste() && batch.key.rotation().rotatesDirections()) {
-            message += ", rotated " + rotatedModules + " module directions (" + batch.key.rotation().label() + ")";
+            logMessage += ", " + rotatedModules + " module directions rotated (" + batch.key.rotation().label() + ")";
         }
-        message += " after " + action + ".";
+        logMessage += " after " + action + ".";
 
-        PpweCompatMod.LOGGER.info("{}: {}", batch.key.actorName(), message);
+        PpweCompatMod.LOGGER.info("{}: {}", batch.key.actorName(), logMessage);
         if (!PpweCompatConfig.areWorldEditSummaryMessagesEnabled()) {
             return;
         }
@@ -210,8 +210,31 @@ final class PrettyPipeEditTracker {
         UUID actorId = batch.key.actorId();
         ServerPlayer player = actorId != null ? batch.key.level().getServer().getPlayerList().getPlayer(actorId) : null;
         if (player != null) {
-            player.sendSystemMessage(Component.literal(message));
+            player.sendSystemMessage(createSummaryMessage(batch, rebuilt, removed, neighborRefreshed, rotatedModules, action));
         }
+    }
+
+    private static Component createSummaryMessage(PendingBatch batch, int rebuilt, int removed, int neighborRefreshed, int rotatedModules, String action) {
+        Component message = PpweMessages.text("Network refresh complete: ")
+            .append(PpweMessages.value(Integer.toString(rebuilt)))
+            .append(PpweMessages.text(" rebuilt, "))
+            .append(PpweMessages.value(Integer.toString(removed)))
+            .append(PpweMessages.text(" removed, "))
+            .append(PpweMessages.value(Integer.toString(neighborRefreshed)))
+            .append(PpweMessages.text(" boundary refreshed"));
+
+        if (batch.key.isPaste() && batch.key.rotation().rotatesDirections()) {
+            message = message.copy()
+                .append(PpweMessages.text(", "))
+                .append(PpweMessages.value(Integer.toString(rotatedModules)))
+                .append(PpweMessages.text(" module directions rotated "))
+                .append(PpweMessages.muted("(" + batch.key.rotation().label() + ")"));
+        }
+
+        return PpweMessages.worldEdit(message.copy()
+            .append(PpweMessages.text(" after "))
+            .append(PpweMessages.value(action))
+            .append(PpweMessages.text(".")));
     }
 
     private static void addNeighborPositions(PendingBatch batch, BlockPos pos) {
